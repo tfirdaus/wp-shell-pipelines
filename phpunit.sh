@@ -4,8 +4,6 @@ while IFS= read -r line; do
 	export "$(echo -e "$line" | sed -e 's/[[:space:]]*$//' -e "s/'//g")"
 done < <(grep WP_ .env) # Get the "WP_" variables.
 
-set -ex
-
 run_phpunit() {
 	echo -e "\\n🔋 Starting PHPUnit."
 

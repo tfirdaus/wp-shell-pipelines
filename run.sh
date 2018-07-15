@@ -14,8 +14,8 @@ test_phpunit() {
 
 		echo -e "\\nRun PHPUnit in $SERVICE";
 		docker-compose run --rm "$SERVICE" bash -c "\
-		bash ${WP_PROJECT_DIR}/bin/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASSWORD $DB_HOST latest true; \
-		bash ${WP_PROJECT_DIR}/bin/ci-phpunit.sh"
+		bash ${WP_PROJECT_DIR}/$(dirname "$0")/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASSWORD $DB_HOST latest true; \
+		bash ${WP_PROJECT_DIR}/$(dirname "$0")/ci-phpunit.sh"
 
 		if [[ $? == 1 ]]; then
 			exit $?
