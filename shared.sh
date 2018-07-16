@@ -24,21 +24,16 @@ diff_files() {
 # Run PHPUnit in each listed WordPress service in docker-compose.
 test_phpunit() {
 
-	PHP_STAGED_FILES=$(diff_files --ext=".php")
+	for SERVICE in $WORDPRESS_SERVICES; do
 
-	if [[ ! -z $PHP_STAGED_FILES ]]; then
-		for SERVICE in $WORDPRESS_SERVICES; do
+		echo -e "\\nRun PHPUnit in $SERVICE";
+		docker-compose run --rm "$SERVICE" bash -c "\
+		bash ${WP_PROJECT_DIR}/$(dirname "$0")/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASSWORD $DB_HOST latest true; \
+		bash ${WP_PROJECT_DIR}/$(dirname "$0")/phpunit.sh"
+		STATUS=$?
 
-			echo -e "\\nRun PHPUnit in $SERVICE";
-			docker-compose run --rm "$SERVICE" bash -c "\
-			bash ${WP_PROJECT_DIR}/$(dirname "$0")/install-wp-tests.sh $DB_NAME $DB_USER $DB_PASSWORD $DB_HOST latest true; \
-			bash ${WP_PROJECT_DIR}/$(dirname "$0")/ci-phpunit.sh"
-
-			if [[ $? == 1 ]]; then
-				exit $?
-			fi
-		done
-	fi
+		if [[ "$STATUS" -ge "1" ]]; then
+			exit 1;
+		fi
+	done
 }
-
-test_phpunit
