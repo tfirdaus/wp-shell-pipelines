@@ -6,7 +6,6 @@ run_phpunit() {
 	local WP_TEMPDIR=${TMPDIR-/tmp}
 	local WP_TESTS_DIR=${WP_TESTS_DIR-$WP_TEMPDIR/wordpress-tests-lib}
 	local WP_CORE_DIR=${WP_CORE_DIR:-$WP_TEMPDIR/wordpress/}
-	local PLUGINS_INSTALLED=()
 
 	# Copy the config from the test config to allow us install WordPress Core
 	if [[ ! -e "$WP_CORE_DIR"wp-config.php ]]; then
