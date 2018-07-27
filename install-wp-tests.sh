@@ -147,7 +147,11 @@ install_db() {
 	fi
 
 	# create database
-	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
+	if ! mysql -e "SHOW DATABASES LIKE '$DB_NAME'" --user="$DB_USER" --password="$DB_PASS"$EXTRA | grep "$DB_NAME"; then
+		mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
+	else
+		echo "👍 Database is already created."
+	fi
 }
 
 install_wp
