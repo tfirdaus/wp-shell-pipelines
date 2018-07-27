@@ -1,15 +1,11 @@
 #!/bin/bash
 
-while IFS= read -r line; do
-	export "$(echo -e "$line" | sed -e 's/[[:space:]]*$//' -e "s/'//g")"
-done < <(grep WP_ .env) # Get the "WP_" variables.
-
 run_phpunit() {
 	echo -e "\\n🔋 Starting PHPUnit."
 
-	local WP_TEMP_DIR=${TMPDIR-/tmp}
-	local WP_TESTS_DIR=${WP_TESTS_DIR-$WP_TEMP_DIR/wordpress-tests-lib}
-	local WP_CORE_DIR=${WP_CORE_DIR:-$WP_TEMP_DIR/wordpress/}
+	local WP_TEMPDIR=${TMPDIR-/tmp}
+	local WP_TESTS_DIR=${WP_TESTS_DIR-$WP_TEMPDIR/wordpress-tests-lib}
+	local WP_CORE_DIR=${WP_CORE_DIR:-$WP_TEMPDIR/wordpress/}
 	local PLUGINS_INSTALLED=()
 
 	# Copy the config from the test config to allow us install WordPress Core
@@ -27,33 +23,36 @@ run_phpunit() {
 	fi
 
 	# Install WordPress Core to allow us using wp-cli.
-	if ! wp core is-installed --path="$WP_CORE_DIR" &>/dev/null; then
+	if ! wp core is-installed --path="$WP_CORE_DIR" --allow-root; then
+		echo -e "\\n🚥 Installing WordPress..."
 		wp core install --path="$WP_CORE_DIR" --allow-root --skip-email \
 			--title=WordPress \
 			--url=example.org \
 			--admin_user=admin \
 			--admin_password=password \
 			--admin_email=admin@example.org
+	else
+		echo "👍 WordPress is already installed."
 	fi
 
 	# Get the list of WordPress Plugins
-	IFS=',' read -ra WP_PLUGIN_SLUGS <<< "$WP_PLUGINS"
+	IFS=',' read -ra WP_PLUGIN_SLUGS <<< "$WP_TESTS_ACTIVATED_PLUGINS"
 	if [[ ${WP_PLUGIN_SLUGS[*]} ]]; then
 		for WP_PLUGIN_SLUG in "${WP_PLUGIN_SLUGS[@]}"; do
 			if ! wp plugin is-installed "$WP_PLUGIN_SLUG" --path="$WP_CORE_DIR" --allow-root; then
-				PLUGINS_INSTALLED+=("$WP_PLUGIN_SLUG")
+				echo -e "\\n🚥 Installing $WP_PLUGIN_SLUG plugin..."
+				wp plugin install "$WP_PLUGIN_SLUG" --path="$WP_CORE_DIR" --allow-root
 			else
-				echo "⚠️ '${WP_PLUGIN_SLUG}' plugin already installed."
+				echo "👍 Plugin '${WP_PLUGIN_SLUG}' is already installed."
 			fi
 		done
-	fi
-
-	if [[ ${PLUGINS_INSTALLED[*]} ]]; then
-		echo -e "\\n🚥 Installing WordPress plugins..."
-		wp plugin install "${PLUGINS_INSTALLED[@]}" --path="$WP_CORE_DIR" --allow-root
 	fi
 
 	# Run PHPUnit
 	phpunit
 }
-run_phpunit
+
+"$(dirname "$0")/install-wp-tests.sh" "$DB_NAME" "$DB_USER" "$DB_PASSWORD" "$DB_HOST" \
+"${WP_TESTS_VERSION-latest}" \
+"${SKIP_DB_CREATE-false}" \
+&& run_phpunit
