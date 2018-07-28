@@ -7,5 +7,6 @@ source "$(dirname "$0")/shared.sh"
 # Check PHP files staged in the
 PHP_STAGED_FILES=$(diff_files --ext=".php")
 if [[ ! -z $PHP_STAGED_FILES ]]; then
+	test_phpcs
 	test_phpunit
 fi
