@@ -18,6 +18,30 @@ diff_files() {
 	echo "$(git diff --cached --name-only --diff-filter=ACM | grep "${EXT_PATTERN}")"
 }
 
+# An alias command to run "docker-compose run".
+# Run a command in a running container as the www-data user.
+drun() {
+	DOCKER_SERVICES=$(docker-compose config --services)
+
+	if [[ ! -z "$1" ]] && [[ $(echo "${DOCKER_SERVICES[@]}" | grep -w "$1") == "$1" ]]; then
+		docker-compose run --rm -u www-data "$@"
+	else
+		docker-compose run --rm -u www-data wordpress "$@"
+	fi
+}
+
+# An alias command to run "docker-compose run".
+# Run a command in a running container as the root.
+drun_root() {
+	DOCKER_SERVICES=$(docker-compose config --services)
+
+	if [[ ! -z "$1" ]] && [[ $(echo "${DOCKER_SERVICES[@]}" | grep -w "$1") == "$1" ]]; then
+		docker-compose run --rm "$@"
+	else
+		docker-compose run --rm wordpress "$@"
+	fi
+}
+
 # Run PHPUnit.
 test_phpunit() {
 	IFS=',' read -ra PHPUNIT_SERVICES <<< "$PIPELINES_PHPUNIT_SERVICE"
@@ -28,7 +52,7 @@ test_phpunit() {
 	for SERVICE in "${PHPUNIT_SERVICES[@]}"; do
 		echo -e "\\nRun PHPUnit in $SERVICE";
 
-		docker-compose run --rm "$SERVICE" bash -c "bash $(dirname "$0")/phpunit.sh"
+		drun_root "$SERVICE" bash -c "bash $(dirname "$0")/phpunit.sh"
 		STATUS=$?
 
 		if [[ "$STATUS" -ge "1" ]]; then
@@ -46,7 +70,7 @@ test_phpcs() {
 
 	for SERVICE in "${PHPCS_SERVICES[@]}"; do
 		echo -e "\\nRun PHPCS in $SERVICE";
-		docker-compose run --rm "$SERVICE" bash -c "bash $(dirname "$0")/phpcs.sh"
+		drun_root "$SERVICE" bash -c "bash $(dirname "$0")/phpcs.sh"
 		STATUS=$?
 
 		if [[ "$STATUS" -ge "1" ]]; then
