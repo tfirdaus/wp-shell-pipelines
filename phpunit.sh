@@ -47,11 +47,15 @@ run_phpunit() {
 		done
 	fi
 
-	# Run PHPUnit
-	phpunit
+	# Run PHPUnits
+	if [[ "$1" =~ '--coverage-' ]]; then
+		phpdbg -qrr "$(which phpunit)" "$@"
+	else
+		phpunit "$@"
+	fi
 }
 
 "$(dirname "$0")/install-wp-tests.sh" "$DB_NAME" "$DB_USER" "$DB_PASSWORD" "$DB_HOST" \
 "${WP_TESTS_VERSION-latest}" \
 "${SKIP_DB_CREATE-false}" \
-&& run_phpunit
+&& run_phpunit "$@"
