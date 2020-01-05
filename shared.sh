@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 while IFS= read -r line; do
 	export "$(echo -e "$line" | sed -e 's/[[:space:]]*$//' -e "s/'//g")"

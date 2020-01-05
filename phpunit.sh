@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 run_phpunit() {
 	echo -e "\\n🔋 Starting PHPUnit."
@@ -51,7 +51,19 @@ run_phpunit() {
 	if [[ "$1" =~ '--coverage-' ]]; then
 		phpdbg -qrr "$(which phpunit)" "$@"
 	else
-		phpunit "$@"
+		if [[ $(vendor/bin/phpunit --version) ]]; then
+			vendor/bin/phpunit "$@"
+		elif [[ $(phpcs --version) ]]; then
+			echo "HERE";
+			phpunit "$@"
+		elif [[ $(composer --version) ]]; then
+			echo -e "\\nℹ️ PHPUnit could not be found locally or globally, but Composer is available."
+			echo "🔄 Installing PHPUnit through Composer..."
+
+			# WordPress only compatible with PHPUnit 7
+			composer global require "phpunit/phpunit=^7"
+			"$(composer global config home)"/vendor/bin/phpunit "$@"
+		fi
 	fi
 }
 
