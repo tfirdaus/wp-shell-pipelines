@@ -41,3 +41,40 @@ docker_run_root() {
 		docker-compose run --rm wordpress "$@"
 	fi
 }
+
+# Run PHPUnit testing.
+docker_run_test_phpunit() {
+	IFS=',' read -ra PHPUNIT_SERVICES <<< "$PIPELINES_PHPUNIT_SERVICE"
+	if [[ ${#PHPUNIT_SERVICES[@]} -lt 1 ]]; then
+		PHPUNIT_SERVICES=phpunit;
+	fi
+
+	for SERVICE in "${PHPUNIT_SERVICES[@]}"; do
+		echo -e "\\nRun PHPUnit in $SERVICE";
+
+		docker_run_root "$SERVICE" bash -c "bash $(dirname "$0")/phpunit.sh"
+		STATUS=$?
+
+		if [[ "$STATUS" -ge "1" ]]; then
+			exit 1;
+		fi
+	done
+}
+
+# Check PHPCS violations.
+docker_run_test_phpcs() {
+	IFS=',' read -ra PHPCS_SERVICES <<< "$PIPELINES_PHPCS_SERVICE"
+	if [[ ${#PHPCS_SERVICES[@]} -lt 1 ]]; then
+		PHPCS_SERVICES=phpcs;
+	fi
+
+	for SERVICE in "${PHPCS_SERVICES[@]}"; do
+		echo -e "\\nRun PHPCS in $SERVICE";
+		docker_run_root "$SERVICE" bash -c "bash $(dirname "$0")/phpcs.sh"
+		STATUS=$?
+
+		if [[ "$STATUS" -ge "1" ]]; then
+			exit 1;
+		fi
+	done
+}
