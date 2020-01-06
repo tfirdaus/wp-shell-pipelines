@@ -20,7 +20,7 @@ diff_files() {
 
 # An alias command to run "docker-compose run".
 # Run a command in a running container as the www-data user.
-drun() {
+docker_run() {
 	DOCKER_SERVICES=$(docker-compose config --services)
 
 	if [[ ! -z "$1" ]] && [[ $(echo "${DOCKER_SERVICES[@]}" | grep -w "$1") == "$1" ]]; then
@@ -32,7 +32,7 @@ drun() {
 
 # An alias command to run "docker-compose run".
 # Run a command in a running container as the root.
-drun_root() {
+docker_run_root() {
 	DOCKER_SERVICES=$(docker-compose config --services)
 
 	if [[ ! -z "$1" ]] && [[ $(echo "${DOCKER_SERVICES[@]}" | grep -w "$1") == "$1" ]]; then

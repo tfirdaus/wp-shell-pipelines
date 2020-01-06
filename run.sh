@@ -5,4 +5,4 @@
 source "$(dirname "$0")/shared.sh"
 
 # drun: docker-compose run
-drun "$@"
+docker_run "$@"
