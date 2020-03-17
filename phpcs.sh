@@ -3,9 +3,9 @@
 run_phpcs() {
 
 	if [[ $(vendor/bin/phpcs --version) ]]; then
-		./vendor/bin/phpcs --extensions=php .
+		./vendor/bin/phpcs
   	elif [[ $(phpcs --version) ]]; then
-		phpcs --extensions=php .
+		phpcs
 	elif [[ $(composer --version) ]]; then
 
 		echo -e "\\nℹ️ PHPCS could not be found locally or globally, but Composer is available."
@@ -13,16 +13,16 @@ run_phpcs() {
 
 		composer global require "squizlabs/php_codesniffer=*"
 		"$(composer global config home)"/vendor/bin/phpcs --version
-		"$(composer global config home)"/vendor/bin/phpcs --extensions=php .
+		"$(composer global config home)"/vendor/bin/phpcs
   fi
 }
 
 run_phpcbf() {
 
 	if [[ $(vendor/bin/phpcbf --version) ]]; then
-		./vendor/bin/phpcbf --extensions=php .
+		./vendor/bin/phpcbf
   	elif [[ $(phpcbf --version) ]]; then
-		phpcbf --extensions=php .
+		phpcbf
 	elif [[ $(composer --version) ]]; then
 
 		echo -e "\\nℹ️ PHPCBF could not be found locally or globally, but Composer is available."
@@ -30,7 +30,7 @@ run_phpcbf() {
 
 		composer global require "squizlabs/php_codesniffer=*"
 		"$(composer global config home)"/vendor/bin/phpcbf --version
-		"$(composer global config home)"/vendor/bin/phpcbf --extensions=php .
+		"$(composer global config home)"/vendor/bin/phpcbf
   fi
 }
 
