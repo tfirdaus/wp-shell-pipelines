@@ -58,7 +58,7 @@ run_phpunit() {
 			phpunit "$@"
 		elif [[ $(composer --version) ]]; then
 			echo -e "\\nℹ️ PHPUnit could not be found locally or globally, but Composer is available."
-			echo "🔄 Installing PHPUnit through Composer..."
+			echo -e "🔄Installing PHPUnit through Composer..."
 
 			# WordPress only compatible with PHPUnit 7
 			composer global require "phpunit/phpunit=^7"
