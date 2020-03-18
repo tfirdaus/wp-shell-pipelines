@@ -4,6 +4,10 @@ while IFS= read -r line; do
 	export "$(echo -e "$line" | sed -e 's/[[:space:]]*$//' -e "s/'//g")"
 done < <(grep -e PIPELINES_ .env)
 
+while IFS= read -r line; do
+	export "$(echo -e "$line" | sed -e 's/[[:space:]]*$//' -e "s/'//g")"
+done < <(grep -e WP_ .env)
+
 diff_files() {
 
 	for i in "$@"; do
@@ -70,7 +74,7 @@ docker_run_test_phpcs() {
 
 	for SERVICE in "${PHPCS_SERVICES[@]}"; do
 		echo -e "\\nRun PHPCS in $SERVICE";
-		docker_run_root "$SERVICE" bash -c "bash $(dirname "$0")/phpcs.sh"
+		docker_run_root "$SERVICE" bash -c "bash $WP_PROJECT_DIR/wp-dev-kit/pipelines/phpcs.sh"
 		STATUS=$?
 
 		if [[ "$STATUS" -ge "1" ]]; then
