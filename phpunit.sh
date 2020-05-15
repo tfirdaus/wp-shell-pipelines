@@ -51,7 +51,7 @@ run_phpunit() {
 	if [[ "$1" =~ '--coverage-' ]]; then
 		if [[ $(vendor/bin/phpunit --version) ]]; then
 			phpdbg -qrr vendor/bin/phpunit "$@"
-		elif [[ $(phpcs --version) ]]; then
+		elif [[ $(phpunit --version) ]]; then
 			phpdbg -qrr $(which phpunit) "$@"
 		elif [[ $(composer --version) ]]; then
 			echo -e "\\nℹ️ PHPUnit could not be found locally or globally, but Composer is available."
@@ -64,7 +64,7 @@ run_phpunit() {
 	else
 		if [[ $(vendor/bin/phpunit --version) ]]; then
 			vendor/bin/phpunit "$@"
-		elif [[ $(phpcs --version) ]]; then
+		elif [[ $(phpunit --version) ]]; then
 			phpunit "$@"
 		elif [[ $(composer --version) ]]; then
 			echo -e "\\nℹ️ PHPUnit could not be found locally or globally, but Composer is available."
